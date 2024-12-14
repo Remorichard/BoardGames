@@ -1,6 +1,6 @@
-#include "pyra2.h"
+#include "Pyramid.h"
 #include "5by5.h"
-#include "num.h"
+#include "Numerical.h"
 #include "BoardGame_Classes.h"
 #include <iostream>
 #include <string>
