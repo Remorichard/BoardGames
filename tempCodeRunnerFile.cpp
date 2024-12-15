@@ -16,38 +16,21 @@ public:
     }
 };
 
-void play_pyramidGame(){
-    Pyramid_Board<char> board;
-    Pyramid_player player_1("Player 1", 'X');
-    Pyramid_player player_2("Player 2", 'O');
-    Player<char>* players[] = {&player_1, &player_2};
+void play_pyramidGame() {
+    PyramidBoard<char> board;
 
-    int turn = 0;
-    cout << "starting Pyramid Game!\n";
-    bool valid_move = false;
-    while(!board.game_is_over()){
-        board.display_board();
-        Player<char>* current_player = players[turn];
-        cout<< current_player->getname() <<"'s turn."<<endl;
-        while(!valid_move){
-            int row, col;
-            current_player ->getmove(row, col);
-            valid_move = board.update_board(row, col, current_player->getsymbol());
-            if(!valid_move){
-                cout<<"Invalid move. Try again."<< endl;
-            }
-        }
-        if(board.is_win()){
-            board.display_board();
-            cout <<current_player->getname() <<"wins!"<<endl;
-            return;
-        }
-        turn = (turn + 1) % 2;
+    Human_Player<char> player_1 ("Player 1", 'X');
+    Random_PlayerIm<char> player_2('O');
 
-    }
-    board.display_board();
-    cout<<" Its a draw! "<<endl;
-}   
+    Player<char>* players[2] = { &player_1, &player_2};
+    player_1.setBoard(&board);
+    player_2.setBoard(&board);
+
+    GameManager<char> game_manager(&board, players);
+    game_manager.run();
+
+
+}
 
 void play_fiveTicTac(){
     fiveTictac_Board<char> board;
@@ -118,9 +101,9 @@ void play_numericTictacToe(){
         }
 
         //ask the player to enter row and colum
-        cout<<"Enter row(0-2)";
+        cout<<"Enter row(0-2): ";
         cin>>row;
-        cout<<"Enter column (0-2)";
+        cout<<"Enter column (0-2): ";
         cin>>column;
 
         //making the move

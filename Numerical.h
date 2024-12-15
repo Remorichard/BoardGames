@@ -54,12 +54,12 @@ void NumericalTicTacToeBoard :: display_board(){
     for(int i = 0; i < rows; i++){
         for(int j = 0; j < columns; j++){
             if(board[i][j] == 0){
-                cout << "__";
+                cout << "|_|";
             }else{
-                cout << " " <<board[i][j]<< " ";
+                cout << "|" <<board[i][j];
             }
         }
-        cout << endl;
+        cout << "|" << endl;
     }
 }
 
@@ -76,6 +76,8 @@ bool NumericalTicTacToeBoard :: check_win(){
     //check diagonals
     if(check_sum(board[0][0], board[1][1], board[2][2])) return true;
     if(check_sum(board[0][2], board[1][1], board[2][0])) return true;
+
+    return false;
 }
 
 bool NumericalTicTacToeBoard :: is_win(){

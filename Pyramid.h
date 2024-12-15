@@ -1,149 +1,108 @@
-#ifndef PYRAMID_TIC_TAC_TOE_H
-#define PYRAMID_TIC_TAC_TOE_H
-
 #include "BoardGame_Classes.h"
 #include <iostream>
-#include <cstdlib>
-#include <ctime>
+#include <vector>
 using namespace std;
 
-template<typename T>
-class Pyramid_Board : public Board<T>{
-private:
-    int rows;
-    int columns;
-    T** board;
-    bool check_win(int x, int y, T symbol);
+template <typename T>
+class PyramidBoard : public Board<T>{
 public:
-    Pyramid_Board();
-    ~Pyramid_Board();
-
-    bool update_board(int x, int y, T symbol) override;
-    void display_board() override;
-    bool is_win() override;
-    bool is_draw() override;
-    bool game_is_over() override;
+    PyramidBoard(){
+        this->rows = 3;
+        this->columns = 5;
+        this->board = new T*[this->rows];
+        for(int i = 0; i < this->rows; ++i){
+            this->board[i] = new T[this->columns];
+            fill(this->board[i], this->board[i] + this->columns, T());
+        }
+    }
+    ~PyramidBoard(){
+        for(int i = 0; i < this->rows; ++i){
+            delete[] this->board[i];
+        }
+        delete[] this->board;
+    }
+    bool update_board(int x, int y, T symbol) override{
+        if(x < 0 || x >= this->rows || y < 0 || y >= this->columns || this->board[x][y] != T()){
+            return false;
+        }
+        //checking for valid pyramid position
+        if((x == 0 && y != 2) || (x == 1 && (y < 1 || y > 3))){
+            return false;
+        }
+        this->board[x][y] = symbol;
+        ++this->n_moves;
+        return true;
+    }
+    void display_board() override {
+        for(int i = 0; i < this->rows; ++i){
+            for(int j = 0; j < this->columns; ++j){
+                if(i == 0 && j != 2) {
+                    cout << " ";
+                }else if (i == 1 && (j < 1 || j > 3)){
+                    cout << " ";
+                }else {
+                    cout << this->board[i][j] << (j == this->columns - 1 ? "" : " | ");
+                }
+            }
+            cout << endl;
+            if(i != this->rows - 1){
+                cout << string(this->columns * 2 - 1, '-') << endl;
+            }
+        }
+    }
+    bool is_win() override {
+        return check_rows() || check_columns() || check_diagonals();
+    }
+    bool is_draw() override{
+        return this->n_moves == 9 && !is_win();
+    }
+    bool game_is_over() override{
+        return is_win() || is_draw();
+    }
+private:
+    bool check_rows(){
+        for(int i = 0; i < this->rows; ++i){
+            if(i == 0 && this->board[i][2] != T() && this->board[i][2] == this->board[i + 1][1] && this->board[i + 1][1] == this->board[i + 2][0]) return true;
+            if(i == 1 && this->board[i][1] != T() && this->board[i][1] == this->board[i][2] && this->board[i][2] == this->board[i][3]) return true;
+        }
+        return false;
+    }    
+    bool check_columns() {
+        for(int i = 0; i < this->columns; ++i){
+            if(i == 2 && this->board[0][2] != T() && this->board[0][2] == this->board[1][2] && this->board[1][2] == this->board[2][2]) return true;
+        }return false;
+    }
+    bool check_diagonals(){
+        return(this->board[0][2] != T() && this->board[0][2] == this->board[1][1] && this->board[1][1] == this->board[2][0]) ||
+              (this->board[0][2] != T() && this->board[0][2] == this->board[1][3] && this->board[1][3] == this->board[2][4]);
+    }
 };
-
-template<typename T>
-Pyramid_Board<T>::Pyramid_Board(){
-    rows = 3; // pyramid has 3 rows
-    columns = 5; // base has 5 columns
-    board = new T*[rows];
-    
-    //allocating memory for each row based on pyramid structure
-    for(int i = 0; i < rows; i++){
-        int current_columns =columns - (i * 2); // decreasing columns for each row
-        board[i] = new T[current_columns];
-        for(int j = 0; j < current_columns; j++){
-            board[i][j] = T(); // initiliazing with default value (empty cell)
-        }
-    }
-}
-
-template<typename T>
-Pyramid_Board<T>::~Pyramid_Board(){
-    for(int i = 0; i < rows; i++){
-        delete[] board[i];
-    }
-    delete[] board;
-}
-
-template<typename T>
-bool Pyramid_Board<T>::update_board(int x, int y, T symbol){
-    if (x < 0 || x >= rows) return false; // outside row bounds
-    int current_columns = columns - (x * 2); // columns in the current row
-    if(y < 0 || y >= current_columns) return false; // outside column bounds
-    if(board[x][y] != T()) return false; // cell is already occupied
-
-    board[x][y] = symbol;
-    return true;
-}
-
-template<typename T>
-void Pyramid_Board<T>::display_board(){
-    for(int i =0; i < rows; i++){ // starting from the first row(smallest) and mve downward
-        int current_columns = columns - ((rows - 1 - i) * 2); // columns in the current row
-
-        //Add spaces for pyramid aligment
-        for (int sp = 0; sp < rows; sp++){
-            cout << "  ";
-        }
-        for (int j = 0; j < current_columns; j++){
-            if(board[rows - 1- i][j] == T()){
-                cout << " * ";
-            }else{
-                cout << board[i][j]<<" ";//print symbol
-            }
-        }
-        cout << endl;
-    }
-}
-
 template <typename T>
-bool Pyramid_Board<T>::check_win(int x, int y, T symbol){
-    // calulating the current number of columns for row
-    int current_columns = columns - (x * 2);
-
-    //check horizontal win(current row)
-    if(y + 2 < current_columns && 
-        board[x][y] == symbol &&
-        board[x][y + 1] == symbol &&
-        board[x][y + 2] == symbol){
-        return true;// 3 symbols in the same row
+class Human_Player : public Player<T>{
+public: 
+    Human_Player(string name, T symbol) : Player<T>(name, symbol){}
+    void getmove(int& x, int& y) override {
+        cout << this->name << " (" << this->symbol << "), enter your move (row and column): ";
+        cin >> x >> y;
     }
-
-    //check vertical win(rows below)
-    if(x + 2 < rows &&
-        board[x][y] == symbol &&
-        y < columns - ((x + 1) * 2) &&board[x + 1][y] == symbol &&
-        y < columns - ((x + 2) * 2) &&board[x + 2][y] == symbol){
-        return true;
-    }
-
-    //check diagonal(from top-left to bottom-right)
-    if(x + 2 < rows &&
-        y + 2 < current_columns - ((x + 2) * 2) && 
-        board[x][y] == symbol &&
-        board[x + 1][y + 1] == symbol &&
-        board[x + 2][y + 2] == symbol){
-        return true;
-    }
-    //check diagonal(from top-right to bottom-left)
-    if(x + 2 < rows &&
-        y - 2 >= 0 &&
-        board[x][y] == symbol &&
-        board[x + 1][y - 1] == symbol &&
-        board[x + 2][y - 2] == symbol){
-        return true;
-    }
-    
-}
+};
 template <typename T>
-bool Pyramid_Board<T>::is_win(){
-    for(int i = 0; i < rows; i++){
-        int current_columns = columns - ( i * 2);
-        for(int j = 0; j < current_columns; j++){
-            if (board[i][j] != T() && check_win(i, j, board[i][j])){
-                return true;
-            }
-        }
+class Random_PlayerIm : public RandomPlayer<T> {
+private: 
+    bool isvalid_position(int x, int y){
+        // check bounds and the pyramid structure
+        return !(x < 0 || x > 2 || y < 0 || y > 4||
+                 (x == 0 && y != 2) ||
+                 (x == 1 && (y < 1 || y > 3)));
     }
-    return false;
-}
-template <typename T>
-bool Pyramid_Board<T>::is_draw(){
-    for(int i = 0; i < rows; i++){
-        int current_columns = columns - (1 * 2);
-        for(int j = 0; j < current_columns; j++){
-            if(board[i][j] == T()) return false;
-        }
-        
-    }
-    return true;
-}
-template <typename T>
-bool Pyramid_Board<T>::game_is_over(){
-    return is_win() || is_draw();
-}
-#endif //PYRAMID_TIC_TAC_TOE_H
+public:    
+    Random_PlayerIm(T symbol) : RandomPlayer<T>(symbol) {}
+
+    void getmove(int& x, int& y) override {
+        do {
+            x = rand() % 3;
+            y = rand() % 5;
+        }while(!isvalid_position(x, y));
+        cout <<"RandomPlayer Placed "<<this->symbol << " at (" << x << ", " << y << ").\n";
+    } 
+};

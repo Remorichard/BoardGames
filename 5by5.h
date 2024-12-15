@@ -38,6 +38,7 @@ fiveTictac_Board<T>::fiveTictac_Board(){
 template <typename T>
 bool fiveTictac_Board<T>::update_board(int x, int y, T symbol){
     if (x >= 0 && x < this->rows && y >= 0 && y < this->columns && this -> board[x][y] == '_'){
+        this->board[x][y] = symbol;
         ++this->n_moves;
         return true;
     } return false;
@@ -78,6 +79,7 @@ int fiveTictac_Board<T>::count_three_in_row(T symbol){
             }
         }
     }
+    return count;
 }
 template <typename T>
 bool fiveTictac_Board<T>::is_win(){
@@ -86,6 +88,7 @@ bool fiveTictac_Board<T>::is_win(){
 template <typename T>
 bool fiveTictac_Board<T>::is_draw(){
     return this->n_moves == 24;
+    
 }
 template <typename T>
 bool fiveTictac_Board<T>::game_is_over(){
@@ -102,6 +105,7 @@ public:
         while(!validmove){
             x = rand() % 5;
             y = rand() % 5;
+            if(x == 2 && y == 2) continue;
             //check if the board position is valid and empty
             if(this -> boardPtr->update_board(x, y, this->symbol)){
                 validmove =true;

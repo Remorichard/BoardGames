@@ -3,6 +3,8 @@
 #include "Numerical.h"
 #include "BoardGame_Classes.h"
 #include <iostream>
+#include <cstdlib> // For rand() and srand()
+#include <ctime> 
 #include <string>
 
 using namespace std;
@@ -14,6 +16,8 @@ public:
         cin>>x >>y;
     }
 };
+
+
 
 void play_pyramidGame(){
     Pyramid_Board<char> board;
