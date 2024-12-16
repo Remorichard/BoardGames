@@ -1,7 +1,10 @@
 
 #include "Pyramid.h"
 #include "5by5.h"
+#include "wordTic-tac.h"
 #include "Numerical.h"
+#include "fourinraw.h"
+#include "misereTicTac.h"
 #include "BoardGame_Classes.h"
 #include <iostream>
 #include <string>
@@ -123,7 +126,77 @@ void play_numericTictacToe(){
         cout << "It's a draw!" <<endl;
     }
 }
+void play_wordTicToe(){
+    srand(static_cast<unsigned> (time(0)));
 
+    WordTicTacBoard board("dic.txt");
+
+    HumanPlayerImpl human("player 1", ' ');
+    RandomPlayerImpl random(' ');
+
+    Player<char>* players[2] = {&human, &random};
+    GameManager<char> game_manager(&board, players);
+
+    game_manager.run();
+}
+void play_misereTicTaC(){
+    MisereTicTacToeBoard<char> Board;
+    MisereTicTacToePlayer<char>player1("player1", 'X');
+    MisereTicTacToeRandomPlayer<char>player2('O');
+
+    char current_player = 'X';
+    int x, y;
+    while (!Board.game_is_over()){
+        Board.display_board();
+        cout << "currect player: "<< current_player << endl;
+        if (current_player == 'X'){
+            player1.getmove(x, y);
+        }
+        else {
+            player2.getmove(x, y);
+        }
+        if (Board.update_board(x, y, current_player)){
+            if (Board.is_win()){
+                cout << "player "<< (current_player == 'X' ? 'O' : 'X') << "win"<< endl;
+                break;
+            }
+            else if(Board.is_draw()){
+                cout << "It's a draw!"<< endl;
+                break;
+            }
+            current_player = (current_player == 'X') ? 'O' : 'X';
+        }
+
+    }
+}
+void play_fourinraw(){
+    FourInARow<char> board;
+    HumanPlayert<char>Player1("player1", 'X');
+    RandomplayerIm<char> player2 ('O');
+
+    Player<char>* players[2] = {&Player1, &player2};
+    Player1.setBoard(&board);
+    player2.setBoard(&board);
+
+    int currentplayerIndex  = 0;
+    int x, y;
+    cout << " Welcome the four in a Row!\n";
+    board.display_board();
+    while (!board.game_is_over()){
+        cout << players[currentplayerIndex]->getname()<< " (" << players[currentplayerIndex]->getsymbol() << ")'s turn.\n";
+        do {
+            players[currentplayerIndex]->getmove(x, y);
+        } while (!board.update_board(x, y , players[currentplayerIndex]->getsymbol()));
+        board.display_board();
+        currentplayerIndex = 1 - currentplayerIndex;
+    }
+    if (board.is_win()){
+        cout << players[1- currentplayerIndex] ->getname()<<"win!\n";
+
+    } else {
+        cout << "it's a draw\n";
+    }
+}
 
 int main(){
     while(true){
@@ -131,7 +204,10 @@ int main(){
         cout<<" 1.Pyramid Game\n";
         cout<<" 2.5x5 Tic Tac Toe\n";
         cout<<" 3.Numerical Tic Tac Toe\n";
-        cout<<" 4.Exit\n";
+        cout<<" 4.Word Tic Tac Toe\n";
+        cout<<" 5.Four in a Row Tic Tac Toe\n";
+        cout<<" 6.Misere Tic Tac Toe\n";
+        cout<<" 7.Exit\n";
         cout<<" Enter your choice: ";
         int choice;
         cin>>choice;
@@ -143,6 +219,12 @@ int main(){
         }else if(choice == 3){
             play_numericTictacToe();
         }else if(choice == 4){
+            play_wordTicToe();
+        }else if(choice == 5){
+            play_fourinraw();
+        }else if(choice == 6){
+            play_misereTicTaC();
+        }else if(choice == 7){
             cout <<"Exiting. Thank you for playing!!\n";
             break;
         }else {

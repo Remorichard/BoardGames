@@ -51,6 +51,9 @@ void play_pyramidGame(){
     board.display_board();
     cout<<" Its a draw! "<<endl;
 }   
+void play_wordTicToe(){
+    
+}
 
 void play_fiveTicTac(){
     fiveTictac_Board<char> board;
